@@ -18,7 +18,7 @@ app.set("view engine","ejs");
 app.use(express.static(path.join(__dirname,"public")));
 
 app.get("/",(req,res)=>{
-    res.render("index",{title:"Chess Game"});
+    res.render("index",{title:"CheckmateX"});
 })
 
 io.on("connection",function(uniquesocket){
@@ -26,11 +26,13 @@ io.on("connection",function(uniquesocket){
     
     if(!players.white){
         players.white= uniquesocket.id;
-        uniquesocket.emit("playerRole","w"); 
+        uniquesocket.emit("playerRole","w");
+        uniquesocket.emit("boardState", chess.fen());
     }
     else if(!players.black){
         players.black = uniquesocket.id;
         uniquesocket.emit("playerRole", "b");
+        uniquesocket.emit("boardState", chess.fen());
     }
     else{
         uniquesocket.emit("spectatorRole");
@@ -64,7 +66,7 @@ io.on("connection",function(uniquesocket){
         }
         catch(err){
             console.log(err);
-            uniquesocket.emit("invalid move: ",move); 
+            uniquesocket.emit("invalidMove",move); 
         }
     })
 })
